@@ -69,3 +69,18 @@ void ConfigWidget::loadComboBox(QComboBox *c, int v) {
 		disconnect(SIGNAL(intSignal(int)));
 	}
 }
+
+void ConfigWidget::loadComboBox(QComboBox *c, const QVariant &v) {
+	const int index = c->findData(v);
+	if (index == -1) {
+		return;
+	}
+
+	if (c->currentIndex() != index) {
+		c->setCurrentIndex(index);
+	} else {
+		connect(this, SIGNAL(intSignal(int)), c, SIGNAL(currentIndexChanged(int)));
+		emit intSignal(index);
+		disconnect(SIGNAL(intSignal(int)));
+	}
+}

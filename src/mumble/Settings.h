@@ -188,7 +188,7 @@ struct OverlaySettings {
 struct Settings {
 	enum AudioTransmit { Continuous, VAD, PushToTalk };
 	enum VADSource { Amplitude, SignalToNoise };
-	enum LoopMode { None, Local, Server };
+	enum LoopMode { None, LocalOnly, ServerOnly, LocalRegular, ServerRegular };
 	enum ChannelExpand { NoChannels, ChannelsWithUsers, AllChannels };
 	enum ChannelDrag { Ask, DoNothing, Move };
 	enum ServerShow { ShowPopulated, ShowReachable, ShowAll };
@@ -579,5 +579,7 @@ private:
 	void verifySettingsKeys() const;
 	QString findSettingsLocation(bool legacy = false, bool *foundExistingFile = nullptr) const;
 };
+
+Q_DECLARE_METATYPE(Settings::LoopMode)
 
 #endif // MUMBLE_MUMBLE_SETTINGS_H_
