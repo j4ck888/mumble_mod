@@ -110,6 +110,7 @@ public:
 	static procid_t find(const std::string &name, const std::multimap< std::wstring, unsigned long long int > &pids);
 
 	ProcessBase(const procid_t id, const std::string &name);
+	ProcessBase(ProcessBase &&other) = default;
 	virtual ~ProcessBase();
 };
 

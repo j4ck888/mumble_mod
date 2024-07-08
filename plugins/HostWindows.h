@@ -20,6 +20,8 @@ public:
 	Modules modules() const;
 
 	HostWindows(const procid_t pid);
+	HostWindows(const HostWindows &) = delete;
+	HostWindows(HostWindows &&other) noexcept;
 	virtual ~HostWindows();
 };
 
