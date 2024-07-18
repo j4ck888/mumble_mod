@@ -1756,8 +1756,7 @@ void Server::msgACL(ServerUser *uSource, MumbleProto::ACL &msg) {
 	if (!c)
 		return;
 
-	if (!hasPermission(uSource, c, ChanACL::Write)
-		&& !(c->cParent && hasPermission(uSource, c->cParent, ChanACL::Write))) {
+	if (!hasPermission(uSource, c, ChanACL::Write) && !hasPermission(uSource, qhChannels.value(0), ChanACL::Write)) {
 		PERM_DENIED(uSource, c, ChanACL::Write);
 		return;
 	}
