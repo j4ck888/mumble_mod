@@ -819,7 +819,7 @@ void Log::log(MsgType mt, const QString &console, const QString &terse, bool own
 		}
 
 		// Message notification with static sounds
-		int connectedUsers = 0;
+		qsizetype connectedUsers = 0;
 		{
 			QReadLocker lock(&ClientUser::c_qrwlUsers);
 			connectedUsers = ClientUser::c_qmUsers.size();

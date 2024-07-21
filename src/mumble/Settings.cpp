@@ -1112,8 +1112,8 @@ void Settings::legacyLoad(const QString &path) {
 
 		if (pluginKey.contains(QLatin1String("_"))) {
 			// The key contains the filename as well as the hash
-			int index  = pluginKey.lastIndexOf(QLatin1String("_"));
-			pluginHash = pluginKey.right(pluginKey.size() - index - 1);
+			const auto index = pluginKey.lastIndexOf(QLatin1String("_"));
+			pluginHash       = pluginKey.right(pluginKey.size() - index - 1);
 		} else {
 			pluginHash = pluginKey;
 		}

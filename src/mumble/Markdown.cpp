@@ -59,10 +59,10 @@ bool processMarkdownHeader(QString &str, int &offset) {
 
 	const QRegularExpressionMatch match = regexMatch(s_regex, str, offset);
 	if (match.hasMatch()) {
-		int sectionLevel    = match.captured(1).size();
-		QString sectionName = match.captured(2).trimmed().toHtmlEscaped();
+		const auto sectionLevel   = match.captured(1).size();
+		const QString sectionName = match.captured(2).trimmed().toHtmlEscaped();
 
-		QString replacement = QString::fromLatin1("<h%1>%2</h%1>").arg(sectionLevel).arg(sectionName);
+		const QString replacement = QString::fromLatin1("<h%1>%2</h%1>").arg(sectionLevel).arg(sectionName);
 
 		str.replace(match.capturedStart(), match.capturedEnd() - match.capturedStart(), replacement);
 
