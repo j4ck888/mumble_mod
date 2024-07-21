@@ -18,7 +18,9 @@
 #include "Global.h"
 
 #include <QSettings>
+#include <QShortcut>
 #include <QtCore/QMimeData>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QtEndian>
 #include <QtGui/QClipboard>
@@ -28,7 +30,6 @@
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QShortcut>
 #include <QtXml/QDomDocument>
 
 #include <boost/accumulators/statistics/extended_p_square.hpp>
@@ -129,7 +130,11 @@ ServerView::~ServerView() {
 	delete siPublic;
 }
 
+#if QT_VERSION >= 0x060000
+QMimeData *ServerView::mimeData(const QList< QTreeWidgetItem * > &mimeitems) const {
+#else
 QMimeData *ServerView::mimeData(const QList< QTreeWidgetItem * > mimeitems) const {
+#endif
 	if (mimeitems.isEmpty())
 		return nullptr;
 
@@ -154,11 +159,12 @@ void ServerView::fixupName(ServerItem *si) {
 
 	int tag = 1;
 
-	QRegExp tmatch(QLatin1String("(.+)\\((\\d+)\\)"));
-	tmatch.setMinimal(true);
-	if (tmatch.exactMatch(name)) {
-		name = tmatch.capturedTexts().at(1).trimmed();
-		tag  = tmatch.capturedTexts().at(2).toInt();
+	const QRegularExpression regex(QRegularExpression::anchoredPattern(QLatin1String("(.+)\\((\\d+)\\)")),
+								   QRegularExpression::InvertedGreedinessOption);
+	const QRegularExpressionMatch match = regex.match(name);
+	if (match.hasMatch()) {
+		name = match.capturedTexts().at(1).trimmed();
+		tag  = match.capturedTexts().at(2).toInt();
 	}
 
 	bool found;
@@ -734,7 +740,7 @@ bool ServerItem::operator<(const QTreeWidgetItem &o) const {
 		QString a = qsName.toLower();
 		QString b = other.qsName.toLower();
 
-		QRegExp re(QLatin1String("[^0-9a-z]"));
+		QRegularExpression re(QLatin1String("[^0-9a-z]"));
 		a.remove(re);
 		b.remove(re);
 		return a < b;

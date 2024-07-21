@@ -73,7 +73,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImageReader>
 #include <QtGui/QScreen>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
@@ -610,7 +609,11 @@ void MainWindow::msgBox(QString msg) {
 }
 
 #ifdef Q_OS_WIN
+#	if QT_VERSION >= 0x060000
+bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *) {
+#	else
 bool MainWindow::nativeEvent(const QByteArray &, void *message, long *) {
+#	endif
 	MSG *msg = reinterpret_cast< MSG * >(message);
 	if (msg->message == WM_DEVICECHANGE && msg->wParam == DBT_DEVNODES_CHANGED)
 		uiNewHardware++;
