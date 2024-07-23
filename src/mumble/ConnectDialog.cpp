@@ -18,7 +18,9 @@
 #include "Global.h"
 
 #include <QSettings>
+#include <QShortcut>
 #include <QtCore/QMimeData>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QtEndian>
 #include <QtGui/QClipboard>
@@ -28,7 +30,6 @@
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QShortcut>
 #include <QtXml/QDomDocument>
 
 #include <boost/accumulators/statistics/extended_p_square.hpp>
@@ -129,7 +130,11 @@ ServerView::~ServerView() {
 	delete siPublic;
 }
 
+#if QT_VERSION >= 0x060000
+QMimeData *ServerView::mimeData(const QList< QTreeWidgetItem * > &mimeitems) const {
+#else
 QMimeData *ServerView::mimeData(const QList< QTreeWidgetItem * > mimeitems) const {
+#endif
 	if (mimeitems.isEmpty())
 		return nullptr;
 
@@ -154,11 +159,12 @@ void ServerView::fixupName(ServerItem *si) {
 
 	int tag = 1;
 
-	QRegExp tmatch(QLatin1String("(.+)\\((\\d+)\\)"));
-	tmatch.setMinimal(true);
-	if (tmatch.exactMatch(name)) {
-		name = tmatch.capturedTexts().at(1).trimmed();
-		tag  = tmatch.capturedTexts().at(2).toInt();
+	const QRegularExpression regex(QRegularExpression::anchoredPattern(QLatin1String("(.+)\\((\\d+)\\)")),
+								   QRegularExpression::InvertedGreedinessOption);
+	const QRegularExpressionMatch match = regex.match(name);
+	if (match.hasMatch()) {
+		name = match.capturedTexts().at(1).trimmed();
+		tag  = match.capturedTexts().at(2).toInt();
 	}
 
 	bool found;
@@ -734,7 +740,7 @@ bool ServerItem::operator<(const QTreeWidgetItem &o) const {
 		QString a = qsName.toLower();
 		QString b = other.qsName.toLower();
 
-		QRegExp re(QLatin1String("[^0-9a-z]"));
+		QRegularExpression re(QLatin1String("[^0-9a-z]"));
 		a.remove(re);
 		b.remove(re);
 		return a < b;
@@ -925,12 +931,12 @@ void ConnectDialogEdit::accept() {
 
 		// If the user accidentally added a schema or path part, drop it now.
 		// We can't do so during editing as that is quite jarring.
-		const int schemaPos = server.indexOf(QLatin1String("://"));
+		const auto schemaPos = server.indexOf(QLatin1String("://"));
 		if (schemaPos != -1) {
 			server.remove(0, schemaPos + 3);
 		}
 
-		const int pathPos = server.indexOf(QLatin1Char('/'));
+		const auto pathPos = server.indexOf(QLatin1Char('/'));
 		if (pathPos != -1) {
 			server.resize(pathPos);
 		}

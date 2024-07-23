@@ -73,7 +73,6 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImageReader>
 #include <QtGui/QScreen>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
@@ -610,7 +609,11 @@ void MainWindow::msgBox(QString msg) {
 }
 
 #ifdef Q_OS_WIN
+#	if QT_VERSION >= 0x060000
+bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *) {
+#	else
 bool MainWindow::nativeEvent(const QByteArray &, void *message, long *) {
+#	endif
 	MSG *msg = reinterpret_cast< MSG * >(message);
 	if (msg->message == WM_DEVICECHANGE && msg->wParam == DBT_DEVNODES_CHANGED)
 		uiNewHardware++;
@@ -3811,23 +3814,23 @@ void MainWindow::customEvent(QEvent *evt) {
 	ServerHandlerMessageEvent *shme = static_cast< ServerHandlerMessageEvent * >(evt);
 
 #ifdef QT_NO_DEBUG
-#	define PROCESS_MUMBLE_TCP_MESSAGE(name, value)                                \
-		case Mumble::Protocol::TCPMessageType::name: {                             \
-			MumbleProto::name msg;                                                 \
-			if (msg.ParseFromArray(shme->qbaMsg.constData(), shme->qbaMsg.size())) \
-				msg##name(msg);                                                    \
-			break;                                                                 \
+#	define PROCESS_MUMBLE_TCP_MESSAGE(name, value)                                                    \
+		case Mumble::Protocol::TCPMessageType::name: {                                                 \
+			MumbleProto::name msg;                                                                     \
+			if (msg.ParseFromArray(shme->qbaMsg.constData(), static_cast< int >(shme->qbaMsg.size()))) \
+				msg##name(msg);                                                                        \
+			break;                                                                                     \
 		}
 #else
-#	define PROCESS_MUMBLE_TCP_MESSAGE(name, value)                                  \
-		case Mumble::Protocol::TCPMessageType::name: {                               \
-			MumbleProto::name msg;                                                   \
-			if (msg.ParseFromArray(shme->qbaMsg.constData(), shme->qbaMsg.size())) { \
-				printf("%s:\n", #name);                                              \
-				msg.PrintDebugString();                                              \
-				msg##name(msg);                                                      \
-			}                                                                        \
-			break;                                                                   \
+#	define PROCESS_MUMBLE_TCP_MESSAGE(name, value)                                                      \
+		case Mumble::Protocol::TCPMessageType::name: {                                                   \
+			MumbleProto::name msg;                                                                       \
+			if (msg.ParseFromArray(shme->qbaMsg.constData(), static_cast< int >(shme->qbaMsg.size()))) { \
+				printf("%s:\n", #name);                                                                  \
+				msg.PrintDebugString();                                                                  \
+				msg##name(msg);                                                                          \
+			}                                                                                            \
+			break;                                                                                       \
 		}
 #endif
 	switch (shme->type) { MUMBLE_ALL_TCP_MESSAGES }

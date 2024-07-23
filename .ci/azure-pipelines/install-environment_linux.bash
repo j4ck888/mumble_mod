@@ -12,10 +12,9 @@ sudo apt -y install \
 	g++-multilib \
 	ninja-build \
 	pkg-config \
-	qtbase5-dev \
-	qttools5-dev \
-	qttools5-dev-tools \
-	libqt5svg5-dev \
+	qt6-base-dev \
+	qt6-l10n-tools \
+	qt6-svg-dev \
 	libboost-dev \
 	libssl-dev \
 	libprotobuf-dev \
