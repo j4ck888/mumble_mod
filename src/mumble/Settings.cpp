@@ -1286,7 +1286,7 @@ QString Settings::findSettingsLocation(bool legacy, bool *foundExistingFile) con
 
 	QStringList settingsFileNames = legacy ? QStringList({ QStringLiteral("mumble.conf"), QStringLiteral("Mumble.conf"),
 														   QStringLiteral("mumble.ini"), QStringLiteral("Mumble.ini") })
-										   : QStringList({ QStringLiteral("mumble_settings.json") });
+										   : QStringList({ QStringLiteral("mumble_settings1.json") });
 
 	QString chosenPath;
 
